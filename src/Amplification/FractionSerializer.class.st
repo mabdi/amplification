@@ -6,6 +6,7 @@ Class {
 
 { #category : #'as yet unclassified' }
 FractionSerializer class >> priority [
+	
 	^ 9
 ]
 
