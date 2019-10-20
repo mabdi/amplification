@@ -22,24 +22,7 @@ ASTHelper class >> uniqueInstance [
 
 { #category : #'as yet unclassified' }
 ASTHelper >> buildAnTestClassWith: aCollection using: testClass [
-	| tempClass |
-	tempClass := testClass superclass
-		subclass: (testClass name asString , self getId asString) asSymbol
-		instanceVariableNames: testClass instanceVariablesString
-		classVariableNames: ''
-		category: 'Amplification-TempClasses'.
-	#(#setUp #tearDown)
-		do: [ :each | 
-			testClass methods
-				detect: [ :mtd | mtd selector = each ]
-				ifFound: [ :item | tempClass compile: item sourceCode ] ].
-	aCollection do: [ :item | tempClass compile: ((RBParser parseMethod: item) addPragma: (RBPragmaNode selector: #madeBySmallAmp arguments: {  })
-) formattedCode . ].
-tempClass class addInstVarNamed: 'smallamp_logs'.
-tempClass class compile: 'logs ^ smallamp_logs ifNil: [ smallamp_logs:= OrderedCollection new ]  '.
-tempClass compile: 'logFailure: aString self class logs add: aString'.
-tempClass compile: 'isLogging ^true'.
-	^ tempClass
+	 ^ self buildAnTestClassWith: aCollection using: testClass final: false
 ]
 
 { #category : #'as yet unclassified' }
@@ -143,6 +126,14 @@ ASTHelper >> removeAssertionsOld: aMethod [
 		removeAssertions: (RBParser parseMethod: aMethod)
 		transformers: (AssertTransform allSubclasses collect: [ :each | each new ]))
 		formattedCode
+]
+
+{ #category : #removing }
+ASTHelper >> removeClass: theClass source: sid [
+	| debug |
+	debug := false.
+	debug
+		ifFalse: [ theClass removeFromSystem ]
 ]
 
 { #category : #'as yet unclassified' }

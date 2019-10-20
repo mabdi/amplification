@@ -65,7 +65,7 @@ Carving2AssertAmplifier >> doAssertionAmplification: aMethodSrc within: aClass [
 	generatedClass suite run.
 	observer := generatedClass observer.
 	src3 := self insertAsserts: src2 using: observer.
-	generatedClass removeFromSystem.
+	ASTHelper uniqueInstance removeClass: generatedClass source: self class name.
 	^ src3
 ]
 

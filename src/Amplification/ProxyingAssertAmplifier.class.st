@@ -52,7 +52,7 @@ ProxyingAssertAmplifier >> doAssertionAmplification: aMethodSrc within: aClass [
 			[ :mtd | ObservationProxy for: mtd observer: observer inside: generatedClass ].
 	[ generatedClass suite run ]
 		ensure: [ proxies do: [ :mtd | mtd destroy ] ].
-	generatedClass removeFromSystem.
+	ASTHelper uniqueInstance removeClass: generatedClass  source: self class name..
 	^ self insertAsserts: aMethodSrc using: observer
 ]
 

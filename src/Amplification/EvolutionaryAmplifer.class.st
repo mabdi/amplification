@@ -78,6 +78,23 @@ EvolutionaryAmplifer >> doSelection: aPopulation selected: aPopulationAll [
 				targets: obj testTargets ]
 ]
 
+{ #category : #'as yet unclassified' }
+EvolutionaryAmplifer >> initialAssertAmplify: aPopulation [
+	| population |
+	population := aPopulation
+		collect: [ :tcase | 
+			tcase
+				testMethodModified: (self astHelper removeAssertions: tcase testMethod) ]
+		displayingProgress: 'Removing assertions'.
+	population := self doAssertAmplification: population.
+	^ population
+		collect: [ :obj | 
+			TestMethodObject
+				withClass: obj testClass
+				method: (self astHelper cleanUp: obj testMethodModified)
+				targets: obj testTargets ]
+]
+
 { #category : #accessing }
 EvolutionaryAmplifer >> iterations: anInt [
 	iterations := anInt 
@@ -113,6 +130,7 @@ EvolutionaryAmplifer >> start [
 
 	| population resultPeople |
 	EvalLog instanceReset.
+	EvalLog newGeneration.
 	population := PopulationCollection
 		setUpWith:
 			(testMethods
@@ -121,7 +139,8 @@ EvolutionaryAmplifer >> start [
 						withClass: testClass
 						method: tcase
 						targets: targetClasses ]).
-	resultPeople := population clone.
+	
+	resultPeople := self initialAssertAmplify: population clone.
 	(1 to: iterations)
 		do: [ :gen | 
 			EvalLog newGeneration.
@@ -136,7 +155,6 @@ EvolutionaryAmplifer >> start [
 			population := self doAssertAmplification: population.
 			EvalLog tickAt: #assert_amp.
 			EvalLog tickAt: #selection.
-			
 			population := self doSelection: population selected: resultPeople.
 			resultPeople addAll: population.
 			EvalLog tickAt: #selection.

@@ -182,6 +182,6 @@ SmallAmpSelector >> mutalkRun: aPopulation [
 		using: MutantOperator contents
 		with: AllTestsMethodsRunningMutantEvaluationStrategy new.
 	analysis1 run.
-	newTestClass removeFromSystem.
+	ASTHelper uniqueInstance removeClass: newTestClass  source: self class name..
 	^ analysis1
 ]

@@ -21,7 +21,7 @@ MuTalkSelector >> doSelect: aPopulation selected: aPopulationAll [
 		using: MutantOperator contents
 		with: AllTestsMethodsRunningMutantEvaluationStrategy new.
 	analysis1 run.
-	newTestClass removeFromSystem.
+	ASTHelper uniqueInstance removeClass: newTestClass  source: self class name..
 	killSelectors := analysis1 generalResult killedMutants
 		collect: [ :item | 
 			aPopulation
