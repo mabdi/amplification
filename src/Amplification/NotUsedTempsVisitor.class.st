@@ -24,8 +24,9 @@ NotUsedTempsVisitor >> used [ ^ used
 
 { #category : #visiting }
 NotUsedTempsVisitor >> visitMessageNode: aMessageNode [
-	aMessageNode receiver name = tmp_var
-		ifTrue: [ used := true ].
+	aMessageNode receiver isVariable ifTrue: [ aMessageNode receiver name = tmp_var
+		ifTrue: [ used := true ]. ].
+	
 		super visitMessageNode: aMessageNode
 ]
 

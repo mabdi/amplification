@@ -5,15 +5,6 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-CarvingAssertAmplifier >> assertionAmplify: aMethod [
-	^ aMethod
-		testMethodModified:
-			(self 
-				doAssertionAmplification: aMethod testMethodModified
-				within: aMethod testClass)
-]
-
-{ #category : #'as yet unclassified' }
 CarvingAssertAmplifier >> buildAxularyClass: aMethod basedOn: aClass [
 	| generatedClass |
 	generatedClass := ASTHelper uniqueInstance
@@ -38,13 +29,6 @@ CarvingAssertAmplifier >> buildAxularyClass: aMethod basedOn: aClass [
 CarvingAssertAmplifier >> cleanExtraObservations: aMethod [
 	(aMethod body statements
 		select: [ :item | self isObservationPoint: item ]) do: [ :item | aMethod body statements remove: item ]
-]
-
-{ #category : #'as yet unclassified' }
-CarvingAssertAmplifier >> doAssertAmplification: population amplifier: anAmplifier [
-	^ population
-		collect: [ :tcase | self assertionAmplify: tcase ]
-		displayingProgress: 'Assert amplifying'
 ]
 
 { #category : #'as yet unclassified' }

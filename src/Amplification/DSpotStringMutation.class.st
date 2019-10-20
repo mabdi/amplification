@@ -8,13 +8,13 @@ Class {
 DSpotStringMutation >> characterSet [
 	^ String
 		streamContents: [ :stream | 
-			stream write: Character alphabet.
-			stream write: Character alphabet asUppercase.
-			stream write: '0123456789'.
-			stream write: '!@#$%^&*(){}\|''";:?/.>,<`~§±'.
-			stream write: Character space.
-			stream write: Character cr . stream
-				write: Character tab ]
+			Character alphabet putOn: stream.
+			Character alphabet asUppercase putOn: stream.
+			'0123456789' putOn: stream.
+			'!@#$%^&*(){}\|''";:?/.>,<`~§±' putOn: stream.
+			Character space putOn: stream.
+			Character cr putOn: stream.
+			Character tab putOn: stream ]
 ]
 
 { #category : #removing }

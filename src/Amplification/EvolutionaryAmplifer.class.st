@@ -25,7 +25,7 @@ EvolutionaryAmplifer class >> initializeWith: atestClass target: aTarget iterati
 { #category : #asserting }
 EvolutionaryAmplifer >> assertAmplifier [
 	^ assertAmplifier
-		ifNil: [ assertAmplifier := CarvingAssertAmplifier new ]
+		ifNil: [ assertAmplifier := Carving2AssertAmplifier  new ]
 ]
 
 { #category : #accessing }

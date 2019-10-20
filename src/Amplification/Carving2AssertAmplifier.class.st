@@ -1,14 +1,11 @@
 Class {
-	#name : #ProxyingAssertAmplifier,
+	#name : #Carving2AssertAmplifier,
 	#superclass : #AbstractAssertAmplifier,
-	#instVars : [
-		'targets'
-	],
 	#category : #'Amplification-Core'
 }
 
 { #category : #'as yet unclassified' }
-ProxyingAssertAmplifier >> buildAsserts: anObserver [
+Carving2AssertAmplifier >> buildAsserts: anObserver [
 	^ anObserver memory
 		collect: [ :observation | 
 			"self cleanExtraObservations: aMethod"
@@ -34,37 +31,54 @@ ProxyingAssertAmplifier >> buildAsserts: anObserver [
 ]
 
 { #category : #'as yet unclassified' }
-ProxyingAssertAmplifier >> doAssertAmplification: population amplifier: anAmplifier [
-	self targets: anAmplifier targetClasses.
-	^ super doAssertAmplification: population amplifier: anAmplifier
-]
-
-{ #category : #'as yet unclassified' }
-ProxyingAssertAmplifier >> doAssertionAmplification: aMethodSrc within: aClass [
-	| generatedClass observer proxies |
-	observer := Observer new.
+Carving2AssertAmplifier >> buildAxularyClass: aMethod basedOn: aClass [
+	| generatedClass |
 	generatedClass := ASTHelper uniqueInstance
 		buildAnTestClassWith: {}
 		using: aClass.
-	generatedClass compile: aMethodSrc.
-	proxies := self methodsToBeProxied
-		collect:
-			[ :mtd | ObservationProxy for: mtd observer: observer inside: generatedClass ].
-	[ generatedClass suite run ]
-		ensure: [ proxies do: [ :mtd | mtd destroy ] ].
-	generatedClass removeFromSystem.
-	^ self insertAsserts: aMethodSrc using: observer
+	generatedClass class addInstVarNamed: 'observer'.
+	generatedClass class
+		compile: 'observer ^ observer ifNil: [ observer := Observer new ]'.
+	generatedClass class compile: 'isLogging ^true'.
+	generatedClass
+		compile:
+			'observe: anObj name: aString id:anInt 
+			       ^ self class observer observe: anObj name: aString id: anInt'.
+	generatedClass
+		compile:
+			'observeResult: anObj receiver: arec selector: aSelector name: aString id:anInt 
+			       ^ self class observer observeResult: anObj receiver: arec selector: aSelector name: aString id: anInt'.
+	generatedClass compile: aMethod formattedCode.
+	^ generatedClass
 ]
 
 { #category : #'as yet unclassified' }
-ProxyingAssertAmplifier >> insertAsserts: aMethodSrc using: anObserver [
-	| aMethod newAsserts |
+Carving2AssertAmplifier >> doAssertionAmplification: aMethodSrc within: aClass [
+	| generatedClass observer aMethod aVisitor src2 src3 |
+	aMethod := RBParser parseMethod: aMethodSrc.
+	aVisitor := MessageCallRewriter new.
+	aVisitor doYourJob: aMethod.
+	src2 := aMethod formattedCode.
+	aVisitor := ObserverInsert2Rewriter new.
+	aVisitor doYourJob: aMethod.
+	generatedClass := self buildAxularyClass: aMethod basedOn: aClass.
+	generatedClass suite run.
+	observer := generatedClass observer.
+	src3 := self insertAsserts: src2 using: observer.
+	generatedClass removeFromSystem.
+	^ src3
+]
+
+{ #category : #'as yet unclassified' }
+Carving2AssertAmplifier >> insertAsserts: aMethodSrc using: anObserver [
+	| aMethod  newAsserts |
 	newAsserts := self buildAsserts: anObserver.
 	aMethod := RBParser parseMethod: aMethodSrc.
 	newAsserts reverse
 		do: [ :pair | 
 			pair value reverse
 				do: [ :assrt | 
+					
 					assrt selector = #should:raise:
 						ifTrue: [ | msg block |
 							msg := aMethod body statements at: pair key.
@@ -77,28 +91,4 @@ ProxyingAssertAmplifier >> insertAsserts: aMethodSrc using: anObserver [
 							aMethod body statements at: pair key put: assrt	"] " ]
 						ifFalse: [ aMethod body statements add: assrt afterIndex: pair key ] ] ].
 	^ aMethod formattedCode
-]
-
-{ #category : #'as yet unclassified' }
-ProxyingAssertAmplifier >> methodsToBeProxied [
-	| result |
-	result := OrderedCollection new.
-	targets
-		do: [ :aTarget | 
-			result
-				addAll:
-					((Pragma allNamed: #SmallAmpAction in: aTarget)
-						collect: [ :pragma | pragma method ]) ].
-	result ifNotEmpty: [ ^ result ].
-	targets
-		do: [ :aTarget | 
-			result addAll: (aTarget methods reject: [ :mtd | ({ #initialization . #private} indexOf: mtd protocol) > 0 ])
-			
-			 ].
-	^ result
-]
-
-{ #category : #accessing }
-ProxyingAssertAmplifier >> targets: someTargets [
-targets := someTargets 
 ]

@@ -35,6 +35,44 @@ ASTHelper >> buildAnTestClassWith: aCollection using: testClass [
 				ifFound: [ :item | tempClass compile: item sourceCode ] ].
 	aCollection do: [ :item | tempClass compile: ((RBParser parseMethod: item) addPragma: (RBPragmaNode selector: #madeBySmallAmp arguments: {  })
 ) formattedCode . ].
+tempClass class addInstVarNamed: 'smallamp_logs'.
+tempClass class compile: 'logs ^ smallamp_logs ifNil: [ smallamp_logs:= OrderedCollection new ]  '.
+tempClass compile: 'logFailure: aString self class logs add: aString'.
+tempClass compile: 'isLogging ^true'.
+	^ tempClass
+]
+
+{ #category : #'as yet unclassified' }
+ASTHelper >> buildAnTestClassWith: aCollection using: testClass final: isFinal [
+	| tempClass |
+	tempClass := testClass superclass
+		subclass: (testClass name asString , self getId asString) asSymbol
+		instanceVariableNames: testClass instanceVariablesString
+		classVariableNames: ''
+		category: 'Amplification-TempClasses'.
+	#(#setUp #tearDown)
+		do: [ :each | 
+			testClass methods
+				detect: [ :mtd | mtd selector = each ]
+				ifFound: [ :item | tempClass compile: item sourceCode ] ].
+	aCollection
+		do: [ :item | 
+			tempClass
+				compile:
+					((RBParser parseMethod: item)
+						addPragma: (RBPragmaNode selector: #madeBySmallAmp arguments: {}))
+						formattedCode ].
+	isFinal
+		ifFalse: [ tempClass class addInstVarNamed: 'smallamp_logs'.
+			tempClass class
+				compile:
+					'logs ^ smallamp_logs ifNil: [ smallamp_logs:= OrderedCollection new ]  '.
+			tempClass
+				compile: 'logFailure: aString self class logs add: aString'.
+			tempClass compile: 'assert: actual equals: expected description: description ^ self
+		assert: actual = expected
+		description: description'.
+			tempClass compile: 'isLogging ^true' ].
 	^ tempClass
 ]
 
