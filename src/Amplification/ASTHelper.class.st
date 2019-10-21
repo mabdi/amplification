@@ -39,11 +39,14 @@ ASTHelper >> buildAnTestClassWith: aCollection using: testClass final: isFinal [
 				detect: [ :mtd | mtd selector = each ]
 				ifFound: [ :item | tempClass compile: item sourceCode ] ].
 	aCollection
-		do: [ :item | 
+		do: [ :item | |ast|
+			ast := RBParser parseMethod: item. 
+			(ast hasPragmaNamed: #madeBySmallAmp) ifFalse: [ ast
+						addPragma: (RBPragmaNode selector: #madeBySmallAmp arguments: {}) ].
+			 
 			tempClass
 				compile:
-					((RBParser parseMethod: item)
-						addPragma: (RBPragmaNode selector: #madeBySmallAmp arguments: {}))
+					ast
 						formattedCode ].
 	isFinal
 		ifFalse: [ tempClass class addInstVarNamed: 'smallamp_logs'.
@@ -52,7 +55,9 @@ ASTHelper >> buildAnTestClassWith: aCollection using: testClass final: isFinal [
 					'logs ^ smallamp_logs ifNil: [ smallamp_logs:= OrderedCollection new ]  '.
 			tempClass
 				compile: 'logFailure: aString self class logs add: aString'.
-			tempClass compile: 'assert: actual equals: expected description: description ^ self
+			tempClass
+				compile:
+					'assert: actual equals: expected description: description ^ self
 		assert: actual = expected
 		description: description'.
 			tempClass compile: 'isLogging ^true' ].
