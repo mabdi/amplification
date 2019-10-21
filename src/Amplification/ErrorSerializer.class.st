@@ -6,15 +6,17 @@ Class {
 
 { #category : #asserting }
 ErrorSerializer class >> makeAssertError: aValue [
-	| assertStatement theMessage theError |
+	| assertStatement theMessage theError theDiscription |
 	theMessage := RBVariableNode named: 'fake'.
 	theError := RBVariableNode named: aValue.
+	theDiscription := RBLiteralValueNode value: 'smallAmp'.
 	assertStatement := RBMessageNode
 		receiver: (RBSelfNode named: 'self')
-		selector: #should:raise:
+		selector: #should:raise:description:
 		arguments:
 			{theMessage.
-			theError}.
+			theError.
+			theDiscription}.
 	^ assertStatement
 ]
 

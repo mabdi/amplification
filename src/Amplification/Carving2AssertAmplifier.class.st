@@ -99,15 +99,16 @@ Carving2AssertAmplifier >> doAssertionAmplification: aMethodSrc within: aClass [
 
 { #category : #'as yet unclassified' }
 Carving2AssertAmplifier >> insertAsserts: aMethodSrc using: anObserver [
-	| aMethod  newAsserts |
+	| aMethod newAsserts |
 	aMethod := RBParser parseMethod: aMethodSrc.
-	newAsserts := self buildAsserts: anObserver methodName: aMethod selector.
+	newAsserts := self
+		buildAsserts: anObserver
+		methodName: aMethod selector.
 	newAsserts reverse
 		do: [ :pair | 
 			pair value reverse
 				do: [ :assrt | 
-					
-					assrt selector = #should:raise:
+					assrt selector = #should:raise:description:
 						ifTrue: [ | msg block |
 							msg := aMethod body statements at: pair key.
 							block := RBBlockNode body: (RBSequenceNode statements: {msg}).
