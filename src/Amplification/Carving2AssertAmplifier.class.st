@@ -5,33 +5,6 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-Carving2AssertAmplifier >> buildAsserts: anObserver [
-	^ anObserver memory
-		collect: [ :observation | 
-			"self cleanExtraObservations: aMethod"
-			| asserts unserializer generateAsserts |
-			generateAsserts := true.
-			observation
-				at: #equalReceiver
-				ifPresent: [ :equalReceiver | 
-					equalReceiver
-						ifTrue: [ generateAsserts := false ] ].
-			observation at: #class ifAbsent: [ generateAsserts := false ].
-			asserts := OrderedCollection new.
-			observation
-				at: #exceptionClass
-				ifPresent: [ :exceptionClass | 
-					asserts := {(ErrorSerializer makeAssertError: exceptionClass)}.
-					generateAsserts := false ].
-			generateAsserts
-				ifTrue: [ unserializer := SerializerFactory getUnserializer: observation.
-					asserts := unserializer
-						makeAssertsBasedOnMemory: anObserver memory ].
-			asserts do: [:assrt| assrt arguments detect: [ :obj | obj class = RBLiteralValueNode and: [ obj value = 'smallAmp' ] ] ifFound: [ :obj | obj value: (observation at: #id) asString start: 0 stop: -1 ] ].
-			(observation at: #id) -> asserts ]
-]
-
-{ #category : #'as yet unclassified' }
 Carving2AssertAmplifier >> buildAsserts: anObserver methodName: selector [
 	^ anObserver memory
 		collect: [ :observation | 
@@ -54,7 +27,16 @@ Carving2AssertAmplifier >> buildAsserts: anObserver methodName: selector [
 				ifTrue: [ unserializer := SerializerFactory getUnserializer: observation.
 					asserts := unserializer
 						makeAssertsBasedOnMemory: anObserver memory ].
-			asserts do: [:assrt| assrt arguments detect: [ :obj | obj class = RBLiteralValueNode and: [ obj value = 'smallAmp' ] ] ifFound: [ :obj | obj value: selector asString, ':' , (observation at: #id) asString start: 0 stop: -1 ] ].
+			asserts
+				doWithIndex: [ :assrt :index | 
+					assrt arguments
+						detect:
+							[ :obj | obj class = RBLiteralValueNode and: [ obj value = 'smallAmp' ] ]
+						ifFound: [ :obj | 
+							obj
+								value: selector asString , ':' , (observation at: #id) asString , '.' , index asString
+								start: 0
+								stop: -1 ] ].
 			(observation at: #id) -> asserts ]
 ]
 
@@ -104,6 +86,7 @@ Carving2AssertAmplifier >> insertAsserts: aMethodSrc using: anObserver [
 	newAsserts := self
 		buildAsserts: anObserver
 		methodName: aMethod selector.
+		
 	newAsserts reverse
 		do: [ :pair | 
 			pair value reverse
