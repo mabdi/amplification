@@ -12,10 +12,10 @@ PrimitiveSerializer class >> makeAssertName: aName value: aValue last: theLast [
 		value: (SerializerFactory unserialize: aValue).
 	assertStatement := RBMessageNode
 		receiver: (RBSelfNode named: 'self')
-		selector: #assert:equals:
+		selector: #assert:equals:description:
 		arguments:
 			{theObject.
-			theValue}.
+			theValue .     RBLiteralValueNode value: 'smallAmp'      }.
 	^ {assertStatement}
 ]
 

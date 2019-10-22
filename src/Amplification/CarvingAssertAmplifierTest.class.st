@@ -36,7 +36,7 @@ CarvingAssertAmplifierTest >> testAssertionGenerationCollection [
 	generatedClass := instance buildAxularyClass: aMethod basedOn: aClass.
 	generatedClass suite run.
 	observer := generatedClass observer.
-	generatedClass removeFromSystem.
+	ASTHelper uniqueInstance removeClass: generatedClass  source: self class name..
 	instance insertAsserts: aMethod using: observer.
 	self
 		assert: (GeneralHelper renameTempVars: aMethod formattedCode)
@@ -85,7 +85,7 @@ CarvingAssertAmplifierTest >> testAssertionGenerationCollection1 [
 	generatedClass := instance buildAxularyClass: aMethod basedOn: aClass.
 	generatedClass suite run.
 	observer := generatedClass observer.
-	generatedClass removeFromSystem.
+	ASTHelper uniqueInstance removeClass: generatedClass  source: self class name..
 	instance insertAsserts: aMethod using: observer.
 	self
 		assert: (GeneralHelper renameTempVars: aMethod formattedCode)
@@ -116,7 +116,7 @@ CarvingAssertAmplifierTest >> testAssertionGenerationCollectionAdd [
 	generatedClass := instance buildAxularyClass: aMethod basedOn: aClass.
 	generatedClass suite run.
 	observer := generatedClass observer.
-	generatedClass removeFromSystem.
+	ASTHelper uniqueInstance removeClass: generatedClass  source: self class name..
 	instance insertAsserts: aMethod using: observer.
 	self
 		assert: (GeneralHelper renameTempVars: aMethod formattedCode)
@@ -151,7 +151,7 @@ CarvingAssertAmplifierTest >> testAssertionGenerationCollectionChange [
 	generatedClass := instance buildAxularyClass: aMethod basedOn: aClass.
 	generatedClass suite run.
 	observer := generatedClass observer.
-	generatedClass removeFromSystem.
+	ASTHelper uniqueInstance removeClass: generatedClass  source: self class name..
 	instance insertAsserts: aMethod using: observer.
 	self
 		assert: (GeneralHelper renameTempVars: aMethod formattedCode)
@@ -181,7 +181,7 @@ CarvingAssertAmplifierTest >> testAssertionGenerationCollectionRemove [
 	generatedClass := instance buildAxularyClass: aMethod basedOn: aClass.
 	generatedClass suite run.
 	observer := generatedClass observer.
-	generatedClass removeFromSystem.
+	ASTHelper uniqueInstance removeClass: generatedClass  source: self class name..
 	instance insertAsserts: aMethod using: observer.
 	self
 		assert: (GeneralHelper renameTempVars: aMethod formattedCode)
@@ -215,7 +215,7 @@ CarvingAssertAmplifierTest >> testAssertionGenerationCollectionSize [
 	generatedClass := instance buildAxularyClass: aMethod basedOn: aClass.
 	generatedClass suite run.
 	observer := generatedClass observer.
-	generatedClass removeFromSystem.
+	ASTHelper uniqueInstance removeClass: generatedClass  source: self class name..
 	instance insertAsserts: aMethod using: observer.
 	self
 		assert: (GeneralHelper renameTempVars: aMethod formattedCode)
@@ -253,7 +253,7 @@ CarvingAssertAmplifierTest >> testAssertionGenerationComplex [
 	generatedClass := instance buildAxularyClass: aMethod basedOn: aClass.
 	generatedClass suite run.
 	observer := generatedClass observer.
-	generatedClass removeFromSystem.
+	ASTHelper uniqueInstance removeClass: generatedClass  source: self class name..
 	instance insertAsserts: aMethod using: observer.
 	self
 		assert: (GeneralHelper renameTempVars: aMethod formattedCode)
@@ -296,7 +296,7 @@ CarvingAssertAmplifierTest >> testAssertionGenerationObject [
 	generatedClass := instance buildAxularyClass: aMethod basedOn: aClass.
 	generatedClass suite run.
 	observer := generatedClass observer.
-	generatedClass removeFromSystem.
+	ASTHelper uniqueInstance removeClass: generatedClass  source: self class name..
 	instance insertAsserts: aMethod using: observer.
 	self
 		assert: (GeneralHelper renameTempVars: aMethod formattedCode)
@@ -331,7 +331,7 @@ CarvingAssertAmplifierTest >> testAssertionGenerationPrimitive [
 	generatedClass := instance buildAxularyClass: aMethod basedOn: aClass.
 	generatedClass suite run.
 	observer := generatedClass observer.
-	generatedClass removeFromSystem.
+	ASTHelper uniqueInstance removeClass: generatedClass  source: self class name..
 	instance insertAsserts: aMethod using: observer.
 	self
 		assert: (GeneralHelper renameTempVars: aMethod formattedCode)
@@ -398,7 +398,7 @@ CarvingAssertAmplifierTest >> testObservationCollection [
 		collect: [ :item | 
 			item removeKey: #time.
 			item ]) asString.
-	generatedClass removeFromSystem.
+	ASTHelper uniqueInstance removeClass: generatedClass  source: self class name..
 	self assert: anArrayTime sorted equals: anArrayTime.
 	self
 		assert: aStringNoTime

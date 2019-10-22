@@ -64,6 +64,7 @@ ObservationProxy >> observe: aReceiver selector: aSelector args: anArray results
 	proxyMethod := (self methodNodeFromNode: node) selector.
 	variableName := self variableName: node.
 	receiverName := self receiverName: node.
+	variableName == #tmp ifTrue: [ variableName := #tmp asString + idx ].
 	observer observe: aReceiver name: receiverName id: idx.
 	observer
 		observeResult: result

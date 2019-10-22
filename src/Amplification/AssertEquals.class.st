@@ -11,5 +11,5 @@ AssertEquals >> assertPattern [
 
 { #category : #running }
 AssertEquals >> findPattern [
-	^ {'self assert: ``@actual equals: ``@expected'}
+	^ {'self assert: ``@actual equals: ``@expected'. 'self assert: ``@actual equals: ``@expected description: ``@description'}
 ]

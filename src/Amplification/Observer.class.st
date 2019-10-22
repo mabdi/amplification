@@ -10,6 +10,25 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
+Observer >> ObservationOn: aSelector with: anArray in: aReceiver method: method [
+	| result elapsedTime |
+	[ elapsedTime := Time
+		millisecondsToRun: [ result := aReceiver withArgs: anArray executeMethod: method ].
+	self
+		observe: aReceiver
+		selector: aSelector
+		args: anArray
+		results: result
+		time: elapsedTime.
+	^ result ]
+		on: Error
+		do: [ :ex | 
+			(self observeException: ex)
+				ifTrue: [ ^ aReceiver ]
+				ifFalse: [ ex signal ] ]
+]
+
+{ #category : #'as yet unclassified' }
 Observer >> amplify: aMethod [
 	
 ]

@@ -6,12 +6,12 @@ Class {
 
 { #category : #'as yet unclassified' }
 GeneralHelper class >> randomString [
-		| string |
+	| string |
 	string := String
 		streamContents: [ :stream | 
-			stream write: Character alphabet.
-			stream write: Character alphabet asUppercase.
-			stream write: '0123456789' ].
+			Character alphabet putOn: stream.
+			Character alphabet asUppercase putOn: stream.
+			'0123456789' putOn: stream ].
 	^ (String new: 10) collect: [ :each | string atRandom ]
 ]
 

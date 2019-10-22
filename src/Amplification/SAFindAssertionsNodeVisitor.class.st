@@ -12,7 +12,7 @@ Class {
 { #category : #'as yet unclassified' }
 SAFindAssertionsNodeVisitor >> checkInsideAssertion: aMessageNode [
 	| messageParents |
-	self halt.
+	
 	messageParents := aMessageNode parent parents
 		select: [ :aNode | aNode isKindOf: RBMessageNode ].
 	messageParents ifEmpty: [ isOutSideAnAsserion := true ].

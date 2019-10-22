@@ -22,6 +22,11 @@ ASTHelper class >> uniqueInstance [
 
 { #category : #'as yet unclassified' }
 ASTHelper >> buildAnTestClassWith: aCollection using: testClass [
+	 ^ self buildAnTestClassWith: aCollection using: testClass final: false
+]
+
+{ #category : #'as yet unclassified' }
+ASTHelper >> buildAnTestClassWith: aCollection using: testClass final: isFinal [
 	| tempClass |
 	tempClass := testClass superclass
 		subclass: (testClass name asString , self getId asString) asSymbol
@@ -33,8 +38,32 @@ ASTHelper >> buildAnTestClassWith: aCollection using: testClass [
 			testClass methods
 				detect: [ :mtd | mtd selector = each ]
 				ifFound: [ :item | tempClass compile: item sourceCode ] ].
-	aCollection do: [ :item | tempClass compile: ((RBParser parseMethod: item) addPragma: (RBPragmaNode selector: #madeBySmallAmp arguments: {  })
-) formattedCode . ].
+	aCollection
+		do: [ :item | 
+			| ast |
+			ast := RBParser parseMethod: item.
+			(ast hasPragmaNamed: #madeBySmallAmp)
+				ifFalse: [ ast
+						addPragma: (RBPragmaNode selector: #madeBySmallAmp arguments: {}) ].
+			tempClass compile: ast formattedCode ].
+	isFinal
+		ifFalse: [ tempClass class addInstVarNamed: 'smallamp_logs'.
+			tempClass class
+				compile:
+					'logs ^ smallamp_logs ifNil: [ smallamp_logs:= OrderedCollection new ]  '.
+			tempClass
+				compile: 'logFailure: aString self class logs add: aString'.
+			tempClass
+				compile:
+					'assert: actual equals: expected description: description ^ self
+		assert: actual = expected
+		description: description'.
+		tempClass
+				compile:
+					'deny: actual equals: expected description: description ^ self
+		deny: actual = expected
+		description: description'.
+			tempClass compile: 'isLogging ^true' ].
 	^ tempClass
 ]
 
@@ -105,6 +134,14 @@ ASTHelper >> removeAssertionsOld: aMethod [
 		removeAssertions: (RBParser parseMethod: aMethod)
 		transformers: (AssertTransform allSubclasses collect: [ :each | each new ]))
 		formattedCode
+]
+
+{ #category : #removing }
+ASTHelper >> removeClass: theClass source: sid [
+	| debug |
+	debug := false.
+	debug
+		ifFalse: [ theClass removeFromSystem ]
 ]
 
 { #category : #'as yet unclassified' }

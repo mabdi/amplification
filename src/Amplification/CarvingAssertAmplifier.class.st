@@ -5,15 +5,6 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-CarvingAssertAmplifier >> assertionAmplify: aMethod [
-	^ aMethod
-		testMethodModified:
-			(self 
-				doAssertionAmplification: aMethod testMethodModified
-				within: aMethod testClass)
-]
-
-{ #category : #'as yet unclassified' }
 CarvingAssertAmplifier >> buildAxularyClass: aMethod basedOn: aClass [
 	| generatedClass |
 	generatedClass := ASTHelper uniqueInstance
@@ -41,13 +32,6 @@ CarvingAssertAmplifier >> cleanExtraObservations: aMethod [
 ]
 
 { #category : #'as yet unclassified' }
-CarvingAssertAmplifier >> doAssertAmplification: population amplifier: anAmplifier [
-	^ population
-		collect: [ :tcase | self assertionAmplify: tcase ]
-		displayingProgress: 'Assert amplifying'
-]
-
-{ #category : #'as yet unclassified' }
 CarvingAssertAmplifier >> doAssertionAmplification: aMethodSrc within: aClass [
 	| generatedClass observer aMethod |
 	aMethod := RBParser parseMethod: aMethodSrc.
@@ -56,7 +40,7 @@ CarvingAssertAmplifier >> doAssertionAmplification: aMethodSrc within: aClass [
 	generatedClass suite run.
 	observer := generatedClass observer.
 	self insertAsserts: aMethod using: observer.
-	generatedClass removeFromSystem.
+	ASTHelper uniqueInstance removeClass: generatedClass source: self class name..
 	^ aMethod formattedCode
 ]
 

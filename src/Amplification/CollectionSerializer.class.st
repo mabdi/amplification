@@ -22,7 +22,7 @@ CollectionSerializer class >> assertionsAddingName: aName value: aValue last: th
 								isEqualWith: (b at: i - d size)) not ])
 						ifTrue: [ d ifNotEmpty: [ ^ {} ].
 							d add: i ] ] ].
-	d ifEmpty: [ ^ {  } ].
+	d ifEmpty: [ ^ {} ].
 	d := d at: 1.
 	theObject := RBMessageNode
 		receiver: (RBVariableNode named: aName)
@@ -30,11 +30,12 @@ CollectionSerializer class >> assertionsAddingName: aName value: aValue last: th
 		arguments: {(RBLiteralValueNode value: d)}.
 	assertStatement := RBMessageNode
 		receiver: (RBSelfNode named: 'self')
-		selector: #assert:equals:
+		selector: #assert:equals:description:
 		arguments:
 			{theObject.
 			(RBLiteralValueNode
-				value: (SerializerFactory unserialize: (a at: d)))}.
+				value: (SerializerFactory unserialize: (a at: d)))
+				.(RBLiteralValueNode value: 'smallAmp')}.
 	^ {assertStatement}
 ]
 
@@ -51,11 +52,11 @@ CollectionSerializer class >> assertionsRemovingName: aName value: aValue last: 
 	b
 		doWithIndex: [ :obj :i | 
 			(obj at: #type) = #primitive
-				ifTrue:[((a at: i - d size) isNil
-				or: [ ((SerializerFactory getUnserializer: obj)
-						isEqualWith: (a at: i - d size)) not ])
-				ifTrue: [ d ifNotEmpty: [ ^ {} ].
-					d add: i ]] ].
+				ifTrue: [ ((a at: i - d size) isNil
+						or: [ ((SerializerFactory getUnserializer: obj)
+								isEqualWith: (a at: i - d size)) not ])
+						ifTrue: [ d ifNotEmpty: [ ^ {} ].
+							d add: i ] ] ].
 	d ifEmpty: [ ^ {} ].
 	d := d at: 1.
 	theObject := RBMessageNode
@@ -64,19 +65,19 @@ CollectionSerializer class >> assertionsRemovingName: aName value: aValue last: 
 		arguments: {(RBLiteralValueNode value: d)}.
 	assertStatement := RBMessageNode
 		receiver: (RBSelfNode named: 'self')
-		selector: #deny:equals:
+		selector: #deny:equals:description:
 		arguments:
 			{theObject.
 			(RBLiteralValueNode
-				value: (SerializerFactory unserialize: (b at: d)))}.
+				value: (SerializerFactory unserialize: (b at: d))).(RBLiteralValueNode value: 'smallAmp')}.
 	^ {assertStatement}
 ]
 
 { #category : #'as yet unclassified' }
 CollectionSerializer class >> assertionsSizeName: aName value: aValue last: theLast [
 	| assertStatement theObject theValue |
-	
-	(theLast isNil or: [ (aValue at: #value) size ~= (theLast at: #value) size ])
+	(theLast isNil
+		or: [ (aValue at: #value) size ~= (theLast at: #value) size ])
 		ifFalse: [ ^ {} ].
 	theObject := RBMessageNode
 		receiver: (RBVariableNode named: aName)
@@ -84,10 +85,10 @@ CollectionSerializer class >> assertionsSizeName: aName value: aValue last: theL
 	theValue := RBLiteralValueNode value: (aValue at: #value) size.
 	assertStatement := RBMessageNode
 		receiver: (RBSelfNode named: 'self')
-		selector: #assert:equals:
+		selector: #assert:equals:description:
 		arguments:
 			{theObject.
-			theValue}.
+			theValue.(RBLiteralValueNode value: 'smallAmp')}.
 	^ {assertStatement}
 ]
 
@@ -101,10 +102,9 @@ CollectionSerializer class >> assertionsUpdatingName: aName value: aValue last: 
 	(aValue at: #value)
 		doWithIndex: [ :obj :i | 
 			(obj at: #type) = #primitive
-				ifTrue:
-			[((SerializerFactory getUnserializer: obj)
-				isEqualWith: ((theLast at: #value) at: i))
-				ifFalse: [ d add: i ]] ].
+				ifTrue: [ ((SerializerFactory getUnserializer: obj)
+						isEqualWith: ((theLast at: #value) at: i))
+						ifFalse: [ d add: i ] ] ].
 	asserts := OrderedCollection new.
 	(d takeFirst: 3)
 		do: [ :v | 
@@ -115,11 +115,12 @@ CollectionSerializer class >> assertionsUpdatingName: aName value: aValue last: 
 				arguments: {(RBLiteralValueNode value: v)}.
 			assertStatement := RBMessageNode
 				receiver: (RBSelfNode named: 'self')
-				selector: #assert:equals:
+				selector: #assert:equals:description:
 				arguments:
 					{theObject.
 					(RBLiteralValueNode
-						value: (SerializerFactory unserialize: ((aValue at: #value) at: v)))}.
+						value: (SerializerFactory unserialize: ((aValue at: #value) at: v))).
+					(RBLiteralValueNode value: 'smallAmp')}.
 			asserts add: assertStatement.
 			theObject := RBMessageNode
 				receiver: (RBVariableNode named: aName)
@@ -127,11 +128,11 @@ CollectionSerializer class >> assertionsUpdatingName: aName value: aValue last: 
 				arguments: {(RBLiteralValueNode value: v)}.
 			assertStatement := RBMessageNode
 				receiver: (RBSelfNode named: 'self')
-				selector: #deny:equals:
+				selector: #deny:equals:description:
 				arguments:
 					{theObject.
 					(RBLiteralValueNode
-						value: (SerializerFactory unserialize: ((theLast at: #value) at: v)))}.
+						value: (SerializerFactory unserialize: ((theLast at: #value) at: v))).(RBLiteralValueNode value: 'smallAmp')}.
 			asserts add: assertStatement ].
 	^ asserts
 ]

@@ -32,7 +32,7 @@ ProxingAssertAmplifierTest >> testAssertError [
 			'testFoo
 	| tmp1 tmp2 |
 	tmp1 := SmallBank2 new.
-	self should: tmp1 deposit: -10 raise: Error'
+	self should: [ tmp1 deposit: -10 ] raise: Error'
 ]
 
 { #category : #tests }
@@ -53,7 +53,7 @@ ProxingAssertAmplifierTest >> testAssertError1 [
 			'testFoo
 	| tmp1 tmp2 |
 	tmp1 := SmallBank2 new.
-	self should: tmp1 deposit: -10 raise: Error'
+	self should: [ tmp2 := tmp1 deposit: -10 ] raise: Error'
 ]
 
 { #category : #tests }
@@ -105,8 +105,8 @@ ProxingAssertAmplifierTest >> testSmallBank2 [
 			'testFoo
 	| tmp1 tmp2 |
 	tmp1 := SmallBank2 new.
-	self should: tmp1 deposit: -10 raise: Error.
-	self should: tmp1 withdraw: 10 raise: Error.
+	self should: [ tmp1 deposit: -10 ] raise: Error.
+	self should: [ tmp1 withdraw: 10 ] raise: Error.
 	tmp1 deposit: 100.
 	self assert: tmp1 balance equals: 100'
 ]

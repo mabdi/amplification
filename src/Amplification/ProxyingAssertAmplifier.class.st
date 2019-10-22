@@ -8,16 +8,6 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-ProxyingAssertAmplifier >> assertionAmplify: aMethod [
-	^ aMethod
-		testMethodModified:
-			(self
-				doAssertionAmplification: aMethod testMethodModified
-				within: aMethod testClass
-				)
-]
-
-{ #category : #'as yet unclassified' }
 ProxyingAssertAmplifier >> buildAsserts: anObserver [
 	^ anObserver memory
 		collect: [ :observation | 
@@ -45,12 +35,8 @@ ProxyingAssertAmplifier >> buildAsserts: anObserver [
 
 { #category : #'as yet unclassified' }
 ProxyingAssertAmplifier >> doAssertAmplification: population amplifier: anAmplifier [
-	"1. Find targets, 2. Install observations, 3. Build method with population 4. run suite 5. read observation"
-
 	self targets: anAmplifier targetClasses.
-	^ population
-		collect: [ :tcase | self assertionAmplify: tcase ]
-		displayingProgress: 'Assert amplifying'
+	^ super doAssertAmplification: population amplifier: anAmplifier
 ]
 
 { #category : #'as yet unclassified' }
@@ -66,7 +52,7 @@ ProxyingAssertAmplifier >> doAssertionAmplification: aMethodSrc within: aClass [
 			[ :mtd | ObservationProxy for: mtd observer: observer inside: generatedClass ].
 	[ generatedClass suite run ]
 		ensure: [ proxies do: [ :mtd | mtd destroy ] ].
-	generatedClass removeFromSystem.
+	ASTHelper uniqueInstance removeClass: generatedClass  source: self class name..
 	^ self insertAsserts: aMethodSrc using: observer
 ]
 
