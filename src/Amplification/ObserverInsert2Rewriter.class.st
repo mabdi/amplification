@@ -36,6 +36,9 @@ x value class = RBCascadeNode
 			x value class = RBMessageNode
 				ifTrue: [ rcv := x value receiver.
 					sel := x value selector ].
+				rcv ifNotNil: [ 
+				
+				
 a:= RBParser parseExpression: '[]
 		on: Error
 		do: [ :ex | 
@@ -54,7 +57,7 @@ a receiver: b.
 aMethod body statements at: idx put: a.
 			
 			
-			
+]			
 			
 			]
 ]
